@@ -2,11 +2,21 @@
 const User = require(`../models/index`).user;
 /** load Operation from Sequelize */
 const Op = require(`sequelize`).Op;
-const {Sequelize} = require('sequelize');
-const sequelize = require('sequelize');
+const { Sequelize } = require("sequelize");
+const sequelize = require("sequelize");
 exports.SIGN_UP = async (req, res) => {
   try {
     const { username, password, user_type } = req.body;
+
+    const unexpectedKeys = Object.keys(req.body).filter(
+      (key) => !["username", "password", "user_type"].includes(key)
+    );
+    if (unexpectedKeys.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid keys: ${unexpectedKeys.join(", ")}`,
+      });
+    }
 
     const newUser = await User.create({
       username: username,

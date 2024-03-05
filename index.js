@@ -1,5 +1,7 @@
 /** load library express */
 const express = require(`express`);
+/** load library express-session */
+const session = require("express-session");
 /** create object that instances of express */
 const app = express();
 /** define port of server */
@@ -8,16 +10,28 @@ const PORT = 8000;
 const cors = require(`cors`);
 /** open CORS policy */
 app.use(cors());
+
+// Configure session middleware
+app.use(
+  session({
+    secret: "G2L",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 /** define all routes */
 const FlagsRoute = require(`./Routes/Flags_Route`);
 const Sign_Up_Route = require(`./Routes/Sign_up`);
 const Login = require(`./Routes/Login`);
-const auth = require(`./Routes/Auth`)
+const Transfer = require("./Routes/Transfer_admin")
+
 /** define prefix for each route */
 app.use(`/Flags`, FlagsRoute);
 app.use(`/Sign_Up`, Sign_Up_Route);
 app.use(`/Login`, Login);
-app.use(`/auth`, auth);
+app.use("/Transfer", Transfer);
+
 /** run server based on defined port */
 app.listen(PORT, () => {
   console.log(`Server of FlagShop runs on port

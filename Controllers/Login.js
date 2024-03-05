@@ -1,42 +1,82 @@
 const { where } = require("sequelize");
-
 /** load model for `members` table */
 const User = require(`../models/index`).user;
 /** load Operation from Sequelize */
 const Op = require(`sequelize`).Op;
 
 exports.login = async (req, res, next) => {
-    try {
-      const { username, password } = req.body;
-      const user = await User.findOne({
-        where: {
-          username: username,
-          password: password,
-        },
-      });
-      console.log(username);
-      console.log(password);
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: "Invalid Username or Password",
-        });
-      }
-      else {
-        return res.status(200).json({
-          success: true,
-          data: {
-            id_user:user.id_user,
-            username:user.username,
-            user_type:user.user_type,
-          }
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
+  try {
+    if (req.session.isLoggedin) {
+      return res.status(400).json({
         success: false,
-        error: "Internal Server Error",
+        error: "User is already logged in. Please sign out first.",
       });
     }
+    const { username, password } = req.body;
+    const unexpectedKeys = Object.keys(req.body).filter(
+      (key) => !["username", "password"].includes(key)
+    );
+    if (unexpectedKeys.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid keys: ${unexpectedKeys.join(", ")}`,
+      });
+    }
+
+    const user = await User.findOne({
+      where: {
+        username: username,
+        password: password,
+      },
+    });
+    console.log(username);
+    console.log(password);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid Username or Password",
+      });
+    } else {
+      const user = await User.findOne({ where: { username, password } });
+      req.session.isAdmin = user.isAdmin === "True";
+      req.session.isLoggedin = true;
+      return res.status(200).json({
+        success: true,
+        data: {
+          id_user: user.id_user,
+          username: user.username,
+          user_type: user.user_type,
+          admin: req.session.isAdmin,
+          // adminq: user.isAdmin
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
+exports.SignOut = async (req, res) => {
+  try {
+    if (!req.session.isLoggedin) {
+      return res.status(400).json({
+        success: false,
+        error: "User is not logged in. Please sign in first.",
+      });
+    }
+    req.session.destroy();
+    return res.status(200).json({
+      success: true,
+      message: "You have successfully signed out",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
 }

@@ -36,15 +36,22 @@ exports.InsertFlag = async (req, res) => {
   try {
     const { Name, Price } = req.body;
     const imageBuffer = req.file.buffer;
-    const newFlag = await FlagsModel.create({
-      flags: imageBuffer,
-      name: Name,
-      price: Price,
-    });
-    res.json({
-      success: true,
-      message: "Flag Inserted successfully",
-    });
+    if (req.session.isAdmin) {
+      const newFlag = await FlagsModel.create({
+        flags: imageBuffer,
+        name: Name,
+        price: Price,
+      });
+      res.json({
+        success: true,
+        message: "Flag Inserted successfully",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "You are not admin",
+      })
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -88,7 +95,7 @@ exports.DeleteAllFlag = async (req, res) => {
       "ALTER TABLE `product` AUTO_INCREMENT = 1"
     );
     console.log(result);
-    if (result ===0) {
+    if (result === 0) {
       // The destroy method returns the number of affected rows, so if it's 0, the record was not found.
       res.json({
         success: true,
@@ -113,7 +120,7 @@ exports.UpdateFlag = async (req, res) => {
     const { Name, Price } = req.body; // Assuming you also send the ID in the request body
     const id = req.params.id;
 
-    const imageBuffer = req.file.buffer;
+    const imageBuffer = req.file;
 
     // Check if the record with the given ID existsxa
     const existingFlag = await FlagsModel.findByPk(id);
