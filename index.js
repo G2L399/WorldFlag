@@ -14,7 +14,7 @@ app.use(cors());
 // Configure session middleware
 app.use(
   session({
-    secret: "hjgh",
+    secret: "fftyyt",
     resave: false,
     saveUninitialized: false,
   })
