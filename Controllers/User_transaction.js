@@ -8,92 +8,108 @@ const transaction_detail = require("../models/index").transaction_detail;
 
 exports.addCart = async (req, res) => {
   try {
-    const idUser = req.session.idUser;
+    console.log(req.user);
+    const idUser = req.session.idUser || req.user.id_user;
     const idProduct = req.params.idProduct;
     const quantity = req.body.quantity;
-
-    const Product = await product.findOne({
-      where: {
-        id_product: idProduct,
-      },
-    });
-    const User = await user.findOne({
-      where: {
-        id_user: idUser,
-      },
-    });
-    const existItem = await cart_detail.findOne({
-      where: {
-        id_user: idUser,
-        id_product: idProduct,
-      },
-    });
-
     if (idUser == null) {
       res.json({
         success: false,
         message: "Please login first",
       });
     }
-    if (!existItem) {
-      const Cart = await cart.create({
-        user: User.username,
-        product: Product.name,
-        quantity: quantity,
-        total_price: Product.price * quantity,
-      });
-
-      console.log(Cart.id_cart);
-      const CartDetail = await cart_detail.create({
-        id_cart: Cart.id_cart,
+    const Product = await product.findOne({
+      where: {
         id_product: idProduct,
-        id_user: idUser,
-        price: Product.price,
+      },
+    });
+    if (Product.stock > 0 && quantity <= Product.stock) {
+      const User = await user.findOne({
+        where: {
+          id_user: idUser,
+        },
       });
-      if (Cart) {
-        res.json({
-          success: true,
-          message:
-            quantity +
-            " items of " +
-            Product.name +
-            " have been added to your shopping cart",
-        });
-      }
-    } else {
-      const existItem2 = await cart_detail.findOne({
+      const existItem = await cart_detail.findOne({
         where: {
           id_user: idUser,
           id_product: idProduct,
         },
       });
-      const existCart = await cart.findOne({
-        where: {
-          id_cart: existItem2.id_cart,
-        },
-      });
-      const Cart = await cart.update(
-        {
-          quantity: existCart.quantity + quantity,
-          total_price: existCart.total_price + Product.price * quantity,
-        },
-        {
-          where: {
-            id_cart: existCart.id_cart,
-          },
-        }
-      );
 
-      if (Cart) {
-        res.json({
-          success: true,
-          message:
-            quantity +
-            " " +
-            Product.name +
-            " have been added to your shopping cart",
+      if (!existItem) {
+        const Cart = await cart.create({
+          user: User.username,
+          product: Product.name,
+          quantity: quantity,
+          total_price: Product.price * quantity,
         });
+
+        console.log(Cart.id_cart);
+        const CartDetail = await cart_detail.create({
+          id_cart: Cart.id_cart,
+          id_product: idProduct,
+          id_user: idUser,
+          price: Product.price,
+        });
+        if (Cart) {
+          const updatedstock = await product.update(
+            { stock: Product.stock - quantity },
+            { where: { id_product: idProduct } }
+          );
+          res.json({
+            success: true,
+            message:
+              quantity +
+              " items of " +
+              Product.name +
+              " have been added to your shopping cart",
+          });
+        }
+      } else {
+        const existItem2 = await cart_detail.findOne({
+          where: {
+            id_user: idUser,
+            id_product: idProduct,
+          },
+        });
+        const existCart = await cart.findOne({
+          where: {
+            id_cart: existItem2.id_cart,
+          },
+        });
+        const Cart = await cart.update(
+          {
+            quantity: existCart.quantity + quantity,
+            total_price: existCart.total_price + Product.price * quantity,
+          },
+          {
+            where: {
+              id_cart: existCart.id_cart,
+            },
+          }
+        );
+
+        if (Cart) {
+          res.json({
+            success: true,
+            message:
+              quantity +
+              " " +
+              Product.name +
+              " have been added to your shopping cart",
+          });
+        }
       }
+    } else if (Product.stock == 0) {
+      res.json({
+        success: false,
+        message: "out of stock",
+      });
+    } else if (quantity > Product.stock) {
+      res.json({
+        success: false,
+        message: "Stock is " + Product.stock
+      });
     }
   } catch (error) {
     console.error(error);
@@ -105,7 +121,7 @@ exports.addCart = async (req, res) => {
 };
 exports.deleteAllCart = async (req, res) => {
   try {
-    const idUser = req.session.idUser;
+    const idUser = req.session.idUser || req.user.id_user;
     const deleted = await cart_detail.findOne({
       where: {
         id_user: idUser,
@@ -136,7 +152,7 @@ exports.deleteAllCart = async (req, res) => {
   }
 };
 exports.DeleteItemFromCart = async (req, res) => {
-  const idUser = req.session.idUser;
+  const idUser = req.session.idUser || req.user.id_user;
   const idProduct = req.params.idProduct;
   const deleted = await cart_detail.findOne({
     where: {
@@ -168,7 +184,7 @@ exports.DeleteItemFromCart = async (req, res) => {
   }
 };
 exports.ChangeQuantity = async (req, res) => {
-  const idUser = req.session.idUser;
+  const idUser = req.session.idUser || req.user.id_user;
   const idProduct = req.params.idProduct;
   const newquantity = req.body.quantity;
 
@@ -235,7 +251,7 @@ exports.ChangeQuantity = async (req, res) => {
 };
 exports.SeeCart = async (req, res) => {
   try {
-    const idUser = req.session.idUser;
+    const idUser = req.session.idUser || req.user.id_user;
     const CartD = await cart_detail.findAll({
       where: {
         id_user: idUser,
@@ -279,7 +295,7 @@ exports.buy = async (req, res) => {
   try {
     const cartdetail = await cart_detail.findAll({
       where: {
-        id_user: req.session.idUser,
+        id_user: req.session.idUser || req.user.id_user,
       },
     });
     if (cartdetail.length > 0) {
@@ -291,7 +307,7 @@ exports.buy = async (req, res) => {
       });
       const User = await user.findOne({
         where: {
-          id_user: req.session.idUser,
+          id_user: req.session.idUser || req.user.id_user,
         },
       });
       const Card = req.body.methodPayment;
@@ -325,14 +341,14 @@ exports.buy = async (req, res) => {
           });
           const updateBalance = await user.update(
             { balance: User.balance - total },
-            { where: { id_user: req.session.idUser } }
+            { where: { id_user: req.session.idUser || req.user.id_user } }
           );
         }
 
         for (let i = 0; i < cartdetail.length; i++) {
           const cartdetail = await cart_detail.findOne({
             where: {
-              id_user: req.session.idUser,
+              id_user: req.session.idUser || req.user.id_user,
             },
           });
           const Cart = await cart.findOne({
@@ -342,7 +358,7 @@ exports.buy = async (req, res) => {
           });
           const transactiondetail = await transaction_detail.create({
             id_transaction: transaction1.id_transaction,
-            id_user: req.session.idUser,
+            id_user: req.session.idUser || req.user.id_user,
             id_product: cartdetail.id_product,
             product: Cart.product,
             quantity: Cart.quantity,
@@ -377,7 +393,7 @@ exports.buy = async (req, res) => {
 };
 exports.History = async (req, res) => {
   try {
-    const idUser = req.session.idUser;
+    const idUser = req.session.idUser || req.user.id_user;
     const History = await transaction_detail.findAll({
       where: {
         id_user: idUser,

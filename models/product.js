@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       flags: DataTypes.BLOB('long'),
       name: DataTypes.STRING,
       price: DataTypes.INTEGER,
-      continent: DataTypes.ENUM("Asia","Europe","North America","South America","Australia","Africa","Antarctica")
+      continent: DataTypes.ENUM("Asia","Europe","North America","South America","Australia","Africa","Antarctica"),
+      stock:DataTypes.INTEGER
     },
     {
       sequelize,

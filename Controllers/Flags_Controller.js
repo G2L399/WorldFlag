@@ -39,13 +39,14 @@ exports.GetFlagsByID = async (request, response) => {
 exports.InsertFlag = async (req, res) => {
   try {
     if (req.session.isAdmin || req.user.isAdmin == "True") {
-      const { Name, Price, Continent } = req.body;
+      const { Name, Price, Continent,Stock } = req.body;
       const imageBuffer = req.file.buffer;
       const newFlag = await FlagsModel.create({
         flags: imageBuffer,
         name: Name,
         price: Price,
         continent: Continent,
+        stock: Stock
       });
       res.json({
         success: true,
@@ -138,7 +139,7 @@ exports.DeleteAllFlag = async (req, res) => {
 exports.UpdateFlag = async (req, res) => {
   try {
     if (req.session.isAdmin || req.user.isAdmin == "True") {
-      const { Name, Price, Continent } = req.body; // Assuming you also send the ID in the request body
+      const { Name, Price, Continent, Stock } = req.body; // Assuming you also send the ID in the request body
       const id = req.params.id;
 
       const imageBuffer = req.file;
@@ -159,6 +160,7 @@ exports.UpdateFlag = async (req, res) => {
         name: Name,
         price: Price,
         continent: Continent,
+        stock: Stock
       });
 
       res.json({
