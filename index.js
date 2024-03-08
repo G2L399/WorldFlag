@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Configure session middleware
 app.use(
   session({
-    secret: "G2L",
+    secret: "fftyyt",
     resave: false,
     saveUninitialized: false,
   })
