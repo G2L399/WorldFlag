@@ -12,9 +12,9 @@ exports.login = async (req, res, next) => {
         error: "User is already logged in. Please sign out first.",
       });
     }
-    const { username, password } = req.body;
+    const { Username, Password } = req.body;
     const unexpectedKeys = Object.keys(req.body).filter(
-      (key) => !["username", "password"].includes(key)
+      (key) => !["Username", "Password"].includes(key)
     );
     if (unexpectedKeys.length > 0) {
       return res.status(400).json({
@@ -25,21 +25,20 @@ exports.login = async (req, res, next) => {
 
     const user = await User.findOne({
       where: {
-        username: username,
-        password: password,
+        username: Username,
+        password: Password,
       },
     });
-    console.log(username);
-    console.log(password);
     if (!user) {
       return res.status(401).json({
         success: false,
         error: "Invalid Username or Password",
       });
     } else {
-      const user = await User.findOne({ where: { username, password } });
+      const user = await User.findOne({ where: { Username, Password } });
       req.session.isAdmin = user.isAdmin === "True";
       req.session.isLoggedin = true;
+      req.session.idUser = user.id_user;
       return res.status(200).json({
         success: true,
         data: {
@@ -47,6 +46,7 @@ exports.login = async (req, res, next) => {
           username: user.username,
           user_type: user.user_type,
           admin: req.session.isAdmin,
+          id: req.session.idUser
           // adminq: user.isAdmin
         },
       });

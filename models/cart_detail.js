@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class product extends Model {
+  class cart_detail extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,24 +11,24 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  product.init(
+  cart_detail.init(
     {
-      id_product: {
+      id_cart_detail: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      flags: DataTypes.BLOB('long'),
-      name: DataTypes.STRING,
+      id_cart: DataTypes.INTEGER,
+      id_product: DataTypes.INTEGER,
+      id_user: DataTypes.INTEGER,
       price: DataTypes.INTEGER,
-      continent: DataTypes.ENUM("Asia","Europe","North America","South America","Australia","Africa","Antarctica")
     },
     {
       sequelize,
-      modelName: "product",
-      tableName: "product", // Table name in the database
+      modelName: "cart_detail",
+      tableName: "cart_detail", // Table name in the database
       timestamps: false, // This line disables createdAt and updatedAt columns
     }
   );
-  return product;
+  return cart_detail;
 };

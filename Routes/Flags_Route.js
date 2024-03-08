@@ -6,15 +6,16 @@ const app = express();
 const multer = require(`multer`);
 const storage = multer.memoryStorage(); // Store files in memory (you can configure it to store in disk)
 const upload = multer({ storage: storage });
+const authorize = require(`./../Controllers/auth.controller`);
 
 /** load member's controller */
 const FlagsController = require(`../Controllers/Flags_Controller`);
 /** create route to get data with method "GET" */
 app.get("/", FlagsController.GetFlags);
 app.get("/:id", FlagsController.GetFlagsByID);
-app.post("/", upload.single("flags"), FlagsController.InsertFlag);
-app.delete("/:id", FlagsController.DeleteFlag);
-app.delete("/", FlagsController.DeleteAllFlag);
-app.put("/:id", upload.single("flags"), FlagsController.UpdateFlag);
+app.post("/",authorize.authorize, upload.single("flags"), FlagsController.InsertFlag);
+app.delete("/:id",authorize.authorize, FlagsController.DeleteFlag);
+app.delete("/", authorize.authorize,FlagsController.DeleteAllFlag);
+app.put("/:id", authorize.authorize,upload.single("flags"), FlagsController.UpdateFlag);
 /** export app in order to load in another file */
 module.exports = app;

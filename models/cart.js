@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class transaksi extends Model {
+  class cart extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,24 +11,24 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  transaksi.init(
+  cart.init(
     {
-      id_transaksi: {
+      id_cart: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      metode_pembayaran: DataTypes.ENUM('Credit Card','Card','Insurance'),
-      jumlah_pembayaran: DataTypes.DECIMAL(10,2),
-      catatan: DataTypes.TEXT,
-      status: DataTypes.ENUM('Completed','Pending')
+      user: DataTypes.STRING,
+      product: DataTypes.STRING,
+      quantity: DataTypes.INTEGER,
+      total_price: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "transaksi",
-      tableName: "transaksi", // Table name in the database
+      modelName: "cart",
+      tableName: "cart", // Table name in the database
       timestamps: false, // This line disables createdAt and updatedAt columns
     }
   );
-  return transaksi;
+  return cart;
 };

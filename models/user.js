@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       user_type: DataTypes.ENUM('Male', 'Female', 'Other'),
       isAdmin: DataTypes.ENUM('True', 'False'),
+      balance: DataTypes.INTEGER
     },
     {
       sequelize,
