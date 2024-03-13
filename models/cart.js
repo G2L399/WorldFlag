@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.cart_detail, {
+        foreignKey: 'id_cart', 
+        as: 'cart', 
+      });
     }
   }
   cart.init(

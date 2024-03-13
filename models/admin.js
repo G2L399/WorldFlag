@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsToMany = (models.user,{
+        foreignKey: 'id_user',
+        as: 'user'
+      })
     }
   }
   admin.init(
