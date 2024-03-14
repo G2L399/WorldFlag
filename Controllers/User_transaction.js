@@ -108,7 +108,7 @@ exports.addCart = async (req, res) => {
     } else if (quantity > Product.stock) {
       res.json({
         success: false,
-        message: "Stock is " + Product.stock
+        message: "Stock is " + Product.stock,
       });
     }
   } catch (error) {
@@ -432,5 +432,23 @@ exports.History = async (req, res) => {
       success: false,
       message: "An error occurred",
     });
+  }
+};
+exports.topup = async (req, res) => {
+  const idUser = req.session.idUser || req.user.id_user;
+  const newBalance = req.body.balance;
+  const User = await user.findOne({
+    where: {
+      id_user: 4,
+    },
+  });
+  const newUser = await user.update(
+    { balance: User.balance + newBalance },
+    { where: { id_user: idUser } }
+  );
+  if (newUser) {
+    res.json({ success: true, message: "Topup Success" });
+  } else {
+    res.json({ success: false, message: "Topup Failed" });
   }
 };
