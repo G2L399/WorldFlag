@@ -447,8 +447,14 @@ exports.topup = async (req, res) => {
     { where: { id_user: idUser } }
   );
   if (newUser) {
-    res.json({ success: true, message: "Topup Success" });
+    res.json({
+      success: true,
+      message: "Topup Success",
+    });
   } else {
-    res.json({ success: false, message: "Topup Failed" });
+    res.json({
+      success: false,
+      message: "Topup Failed",
+    });
   }
 };

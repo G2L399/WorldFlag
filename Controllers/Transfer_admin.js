@@ -52,3 +52,45 @@ exports.transfer = async (req, res) => {
     });
   }
 };
+exports.remove = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    const userid = await user.findOne({ where: { id_user: id } });
+    const UserUsername = userid.username;
+    const UserPassword = userid.password;
+    const secretkey = req.body.secret;
+
+    if (secretkey == "WorldFlagOwnerKey") {
+      if (userid.isAdmin == "True") {
+        const adminDestroyed = await admin.destroy({
+          where: {
+            id_user: id,
+            username: UserUsername,
+            password: UserPassword,
+          },
+        });
+        if (adminDestroyed) {
+          const black = await userid.update({
+            isAdmin: "False",
+          });
+        }
+        res.json({
+          success: true,
+          message: UserUsername + " Is no Longer An Admin",
+        });
+      }
+    } else {
+      res.json({
+        success: false,
+        message: "Invalid key",
+      });
+    }
+  } catch (error) {
+    console.error(error); // Log the error for debugging purposes
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while transferring user to admin",
+    });
+  }
+};

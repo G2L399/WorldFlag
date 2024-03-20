@@ -11,5 +11,6 @@ require(`../Controllers/Sign_up`)
 /** create route to get data with method "GET" */
 app.post("/", SU_Controller.SIGN_UP)
 app.delete("/DeleteAcc", SU_Controller.DeleteAcc)
+app.put("/reset", SU_Controller.ResetPassword)
 /** export app in order to load in another file */
 module.exports = app

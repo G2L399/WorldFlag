@@ -68,3 +68,37 @@ exports.DeleteAcc = async (req, res) => {
     });
   }
 };
+exports.ResetPassword = async (req, res) => {
+  try {
+    const { username, password, newpassword } = req.body;
+    console.log(username);
+    console.log(password);
+    const user = await User.findOne({
+      where: {
+        username: username,
+        password: password,
+      },
+    });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "Invalid Username or Password",
+      });
+    } else {
+      const updated = await User.update(
+        { password: newpassword },
+        { where: { username: username, password: password } }
+      );
+      res.json({
+        success: true,
+        message: "Password Reset successfully",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
+  }
+};
