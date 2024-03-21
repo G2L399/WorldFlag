@@ -8,28 +8,36 @@ exports.transfer = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     const secretkey = req.body.secret;
-    if (secretkey == "WorldFlagOwnerKey") {
-      const adminadd = await admin.create({
-        email: email,
-        nama_admin: AdminName,
-        username: username,
-        password: password,
-      });
-      if (adminadd) {
-        res.json({
-          success: true,
-          message: "Admin Added",
+    const exist = await admin.findOne({ where: { email: email } });
+    if (exist) {
+      if (secretkey == "WorldFlagOwnerKey") {
+        const adminadd = await admin.create({
+          email: email,
+          nama_admin: AdminName,
+          username: username,
+          password: password,
         });
+        if (adminadd) {
+          res.json({
+            success: true,
+            message: "Admin Added",
+          });
+        } else {
+          res.json({
+            success: false,
+            message: "An error occurred while adding admin",
+          });
+        }
       } else {
         res.json({
           success: false,
-          message: "An error occurred while adding admin",
+          message: "Invalid key",
         });
       }
     } else {
       res.json({
         success: false,
-        message: "Invalid key",
+        message: "Admin Exists!",
       });
     }
   } catch (error) {
@@ -48,23 +56,25 @@ exports.remove = async (req, res) => {
     const secretkey = req.body.secret;
 
     if (secretkey == "WorldFlagOwnerKey") {
-        const adminDestroyed = await admin.destroy({
-          where: {
-            id_admin: id,
-          },
+      const adminDestroyed = await admin.destroy({
+        where: {
+          id_admin: id,
+        },
+      });
+      if (adminDestroyed) {
+        res.json({
+          success: true,
+          message:
+            adminp.username +
+            ` (${adminp.nama_admin})` +
+            " Is no Longer An Admin",
         });
-        if (adminDestroyed) {
-          res.json({
-            success: true,
-            message: adminp.username + ` (${adminp.nama_admin})` +" Is no Longer An Admin",
-          });
-        } else {
-          res.json({
-            success: false,
-            message: "An error occurred while removing admin",
-          });
-        }
-      
+      } else {
+        res.json({
+          success: false,
+          message: "An error occurred while removing admin",
+        });
+      }
     } else {
       res.json({
         success: false,
