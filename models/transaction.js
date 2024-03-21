@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.transaction_detail, {
-        foreignKey: 'id_transaction', 
-        as: 'transaction_detail', 
+        foreignKey: "id_transaction",
+        as: "transaction_detail",
       });
     }
   }
@@ -22,12 +22,13 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      metode_pembayaran: DataTypes.ENUM('Credit Card','Debit Card','Balance'),
+      metode_pembayaran: DataTypes.ENUM("Credit Card", "Debit Card", "Balance"),
       user: DataTypes.STRING,
       paid: DataTypes.INTEGER,
-      kembalian:DataTypes.INTEGER,
+      kembalian: DataTypes.INTEGER,
+      purchased: DataTypes.DATEONLY,
       catatan: DataTypes.TEXT,
-      status: DataTypes.ENUM('completed','pending')
+      status: DataTypes.ENUM("completed", "pending"),
     },
     {
       sequelize,

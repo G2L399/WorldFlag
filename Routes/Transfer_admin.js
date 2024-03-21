@@ -3,7 +3,7 @@ const express = require(`express`);
 const app = express();
 const Transfer = require(`../Controllers/Transfer_admin`);
 
-app.post("/:id", Transfer.transfer);
+app.post("/", Transfer.transfer);
 app.post("/remove/:id", Transfer.remove)
 
 module.exports = app;

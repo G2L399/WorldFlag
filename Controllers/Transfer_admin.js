@@ -3,39 +3,27 @@ const admin = require(`../models/index`).admin;
 
 exports.transfer = async (req, res) => {
   try {
-    const id = req.params.id;
-    console.log(id);
-    const userid = await user.findOne({ where: { id_user: id } });
-    const UserUsername = userid.username;
-    const UserPassword = userid.password;
+    const AdminName = req.body.name;
+    const email = req.body.email;
+    const username = req.body.username;
+    const password = req.body.password;
     const secretkey = req.body.secret;
-
     if (secretkey == "WorldFlagOwnerKey") {
-      if (userid.isAdmin == "True") {
-        res.json({
-          success: false,
-          message: UserUsername + " is already an admin",
-        });
-      } else {
-        const admintransferred = await admin.create({
-          nama_admin: "Admin",
-          id_user: id,
-          username: UserUsername,
-          password: UserPassword,
-        });
-        if (admintransferred) {
-          const black = await userid.update({
-            isAdmin: "True",
-          });
-        } else {
-          res.json({
-            success: false,
-            message: "An error occurred while transferring user to admin",
-          });
-        }
+      const adminadd = await admin.create({
+        email: email,
+        nama_admin: AdminName,
+        username: username,
+        password: password,
+      });
+      if (adminadd) {
         res.json({
           success: true,
-          message: UserUsername + " Is Now An Admin",
+          message: "Admin Added",
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "An error occurred while adding admin",
         });
       }
     } else {
@@ -56,30 +44,27 @@ exports.remove = async (req, res) => {
   try {
     const id = req.params.id;
     console.log(id);
-    const userid = await user.findOne({ where: { id_user: id } });
-    const UserUsername = userid.username;
-    const UserPassword = userid.password;
+    const adminp = await admin.findOne({ where: { id_admin: id } });
     const secretkey = req.body.secret;
 
     if (secretkey == "WorldFlagOwnerKey") {
-      if (userid.isAdmin == "True") {
         const adminDestroyed = await admin.destroy({
           where: {
-            id_user: id,
-            username: UserUsername,
-            password: UserPassword,
+            id_admin: id,
           },
         });
         if (adminDestroyed) {
-          const black = await userid.update({
-            isAdmin: "False",
+          res.json({
+            success: true,
+            message: adminp.username + ` (${adminp.nama_admin})` +" Is no Longer An Admin",
+          });
+        } else {
+          res.json({
+            success: false,
+            message: "An error occurred while removing admin",
           });
         }
-        res.json({
-          success: true,
-          message: UserUsername + " Is no Longer An Admin",
-        });
-      }
+      
     } else {
       res.json({
         success: false,
@@ -90,7 +75,7 @@ exports.remove = async (req, res) => {
     console.error(error); // Log the error for debugging purposes
     res.status(500).json({
       success: false,
-      message: "An error occurred while transferring user to admin",
+      message: "Internal Server Error",
     });
   }
 };

@@ -324,19 +324,30 @@ exports.buy = async (req, res) => {
         User.balance == total
       ) {
         if (Card === "Credit Card" || Card === "Debit Card") {
+          const today = new Date();
+          const formattedDate = `${today.getFullYear()}-${(today.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
           transaction1 = await transaction.create({
             metode_pembayaran: Card,
             user: User.username,
             paid: money,
             kembalian: money - total,
+            purchased: formattedDate,
             status: "pending",
           });
         } else if (Card === "Balance") {
+          const today = new Date();
+          const formattedDate = `${today.getFullYear()}-${(today.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
+          console.log(formattedDate);
           transaction1 = await transaction.create({
             metode_pembayaran: Card,
             user: User.username,
             paid: User.balance,
             kembalian: User.balance - total,
+            purchased: formattedDate,
             status: "pending",
           });
           const updateBalance = await user.update(
@@ -369,7 +380,6 @@ exports.buy = async (req, res) => {
               id_cart: Cart.id_cart,
             },
           });
-          console.log(Cart.id_cart);
         }
         res.json({
           success: true,
@@ -459,26 +469,37 @@ exports.topup = async (req, res) => {
   }
 };
 exports.complete = async (req, res) => {
-  const idUser = req.session.idUser || req.user.id_user;
-  const Transaction = await transaction_detail.findAll({
-    where: {
-      id_user: idUser,
-    },
-  });
-  const idTrans = Transaction.map((transaction_detail) => transaction_detail.id_transaction);
-  const transaction1 = await transaction.update(
-    { status: "completed" },
-    { where: { id_transaction: Transaction.idTrans } }
-  );
-  if (transaction1) {
-    res.json({
-      success: true,
-      message: "Payment Success",
+  try {
+    const idUser = req.session.idUser || req.user.id_user;
+    const status = req.body.status;
+    const Transaction = await transaction_detail.findAll({
+      where: {
+        id_user: idUser,
+      },
     });
-  } else {
+    const idTrans = Transaction.map(
+      (transaction) => transaction.id_transaction
+    );
+    const transaction1 = await transaction.update(
+      { status: status },
+      { where: { id_transaction: idTrans } }
+    );
+    if (transaction1) {
+      res.json({
+        success: true,
+        message: "Status Updated Successfully",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "Failed To Update Status",
+      });
+    }
+  } catch (error) {
+    console.error(error);
     res.json({
       success: false,
-      message: "Payment Failed",
+      message: "An error occurred",
     });
   }
-}
+};

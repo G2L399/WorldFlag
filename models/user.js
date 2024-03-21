@@ -17,10 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'id_user', 
         as: 'userAlly', 
       });
-      this.hasMany(models.admin, {
-        foreignKey: 'id_user', 
-        as: 'userAdmin', 
-      });
+      
     }
   }
   user.init(
@@ -33,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
       username: DataTypes.STRING,
       password: DataTypes.STRING,
       user_type: DataTypes.ENUM('Male', 'Female', 'Other'),
-      isAdmin: DataTypes.ENUM('True', 'False'),
       balance: DataTypes.INTEGER
     },
     {

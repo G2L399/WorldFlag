@@ -11,18 +11,13 @@ module.exports = {
           allowNull: false,
           primaryKey: true,
         },
-        nama_admin: {
+        email: {
           type: Sequelize.STRING(255),
           allowNull: true,
         },
-        id_user: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          references: {
-            model: "user",
-            key: "id_user",
-          },
-          unique: "admin_ibfk_1",
+        nama_admin: {
+          type: Sequelize.STRING(255),
+          allowNull: true,
         },
         username: {
           type: Sequelize.STRING(255),

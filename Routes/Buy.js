@@ -9,5 +9,5 @@ const user = require('./../Controllers/User_transaction')
 app.post("/",authorize.authorize,Cart.buy)
 app.get("/",authorize.authorize,Cart.History)
 app.get("/topup",authorize.authorize,user.topup)
-app.put("/CpmpletePayment",authorize.authorize,Cart.complete)
+app.put("/CompletePayment",authorize.authorize,Cart.complete)
 module.exports = app;

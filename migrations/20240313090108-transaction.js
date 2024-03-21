@@ -32,6 +32,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      purchased: {
+        type: Sequelize.DATEONLY,
+        allowNull: false,
+      },
       catatan: {
         type: Sequelize.TEXT,
         allowNull: false,

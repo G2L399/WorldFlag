@@ -40,7 +40,7 @@ exports.InsertFlag = async (req, res) => {
   try {
     if (req.session.isAdmin || req.user.isAdmin == "True") {
       const { Name, Price, Continent,Stock } = req.body;
-      const imageBuffer = req.file.buffer;
+      const imageBuffer = req.file;
       const newFlag = await FlagsModel.create({
         flags: imageBuffer,
         name: Name,
