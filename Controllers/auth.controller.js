@@ -1,81 +1,88 @@
-const jwt = require(`jsonwebtoken`)
-const userModel = require(`../models/index`).user
-const secret = `mokleters`
+const jwt = require(`jsonwebtoken`);
+const userModel = require(`../models/index`).user;
+const secret = `mokleters`;
 
 const authenticate = async (request, response, next) => {
-    let dataLogin = {
-        username: request.body.username,
-        password: request.body.password
-    }
-    
-    /** check data username and password on user's table */
-    let dataUser = await userModel.findOne({ where: dataLogin })
-    
-    /** if data user exists */
-    if(dataUser){
-        /** set payload for generate token.
-        * payload is must be string.
-        * dataUser is object, so we must convert to string.
-        */
-        let payload = JSON.stringify(dataUser)
-        console.log(payload)
+  let dataLogin;
+  if (request.body.username && request.body.password) {
+    dataLogin = {
+      username: request.body.username,
+      password: request.body.password,
+    };
+  } else if (request.body.email && request.body.password) {
+    dataLogin = {
+      email: request.body.email,
+      password: request.body.password,
+    };
+  }
+  console.log(dataLogin);
+  /** check data username and password on user's table */
+  let dataUser = await userModel.findOne({ where: dataLogin });
 
-        /** generate token */
-        let token = jwt.sign(payload, secret)
-        next()
+  /** if data user exists */
+  if (dataUser) {
+    /** set payload for generate token.
+     * payload is must be string.
+     * dataUser is object, so we must convert to string.
+     */
+    let payload = JSON.stringify(dataUser);
+    console.log(payload);
 
-        /** define response */
-        return response.json({
-            success: true,
-            logged: true,
-            message: `Authentication Success`,
-            token: token,
-            data: dataUser
-        })
-    }
+    /** generate token */
+    let token = jwt.sign(payload, secret);
+    next();
 
-    /** if data user is not exists */
+    /** define response */
     return response.json({
-        success: false,
-        logged: false,
-        message: `Authentication Failed. Invalid username or password`
-    })
-}
+      success: true,
+      logged: true,
+      message: `Authentication Success`,
+      token: token,
+      data: dataUser,
+    });
+  }
+
+  /** if data user is not exists */
+  return response.json({
+    success: false,
+    logged: false,
+    message: `Authentication Failed. Invalid username or password`,
+  });
+};
 
 const authorize = (request, response, next) => {
-    /** get "Authorization" value from request's header */
-    const authHeader = request.headers.authorization;
+  /** get "Authorization" value from request's header */
+  const authHeader = request.headers.authorization;
 
-    /** check nullable header */
-    if (authHeader) {
-        /** when using Bearer Token for authorization,
-        * we have to split headers to get token key.
-        * values of headers = Bearers tokenKey
-        */
-        const token = authHeader.split(' ')[1];
+  /** check nullable header */
+  if (authHeader) {
+    /** when using Bearer Token for authorization,
+     * we have to split headers to get token key.
+     * values of headers = Bearers tokenKey
+     */
+    const token = authHeader.split(" ")[1];
 
-        /** verify token using jwt */
-        let verifiedUser = jwt.verify(token, secret);
-        if (!verifiedUser)
-        {
-            return response.json({
-                success: false,
-                auth: false,
-                message: `User Unauthorized`
-            })
-        }
-        
-        request.user = verifiedUser; // payload
-
-        /** if there is no problem, go on to controller */
-        next();
-    } else {
-        return response.json({
-            success: false,
-            auth: false,
-            message: `User Unauthorized`
-        })
+    /** verify token using jwt */
+    let verifiedUser = jwt.verify(token, secret);
+    if (!verifiedUser) {
+      return response.json({
+        success: false,
+        auth: false,
+        message: `User Unauthorized`,
+      });
     }
-}
 
-module.exports = { authenticate, authorize }
+    request.user = verifiedUser; // payload
+
+    /** if there is no problem, go on to controller */
+    next();
+  } else {
+    return response.json({
+      success: false,
+      auth: false,
+      message: `User Unauthorized`,
+    });
+  }
+};
+
+module.exports = { authenticate, authorize };

@@ -458,3 +458,27 @@ exports.topup = async (req, res) => {
     });
   }
 };
+exports.complete = async (req, res) => {
+  const idUser = req.session.idUser || req.user.id_user;
+  const Transaction = await transaction_detail.findAll({
+    where: {
+      id_user: idUser,
+    },
+  });
+  const idTrans = Transaction.map((transaction_detail) => transaction_detail.id_transaction);
+  const transaction1 = await transaction.update(
+    { status: "completed" },
+    { where: { id_transaction: Transaction.idTrans } }
+  );
+  if (transaction1) {
+    res.json({
+      success: true,
+      message: "Payment Success",
+    });
+  } else {
+    res.json({
+      success: false,
+      message: "Payment Failed",
+    });
+  }
+}

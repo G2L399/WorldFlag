@@ -12,5 +12,7 @@ require(`../Controllers/Sign_up`)
 app.post("/", SU_Controller.SIGN_UP)
 app.delete("/DeleteAcc", SU_Controller.DeleteAcc)
 app.put("/reset", SU_Controller.ResetPassword)
+app.post("/PIN", SU_Controller.ForgotPasswordPin)
+app.put("/ChangePassword", SU_Controller.ForgotPasswordChange)
 /** export app in order to load in another file */
 module.exports = app
