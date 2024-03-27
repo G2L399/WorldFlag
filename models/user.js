@@ -10,14 +10,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.transaction_detail, {
-        foreignKey: 'id_user', 
-        as: 'user', 
+        foreignKey: "id_user",
+        as: "user",
       });
       this.hasMany(models.cart_detail, {
-        foreignKey: 'id_user', 
-        as: 'userAlly', 
+        foreignKey: "id_user",
+        as: "userAlly",
       });
-      
     }
   }
   user.init(
@@ -27,10 +26,13 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      profile_picture: DataTypes.BLOB,
+      email: DataTypes.STRING,
       username: DataTypes.STRING,
       password: DataTypes.STRING,
-      user_type: DataTypes.ENUM('Male', 'Female', 'Other'),
-      balance: DataTypes.INTEGER
+      user_type: DataTypes.ENUM("Male", "Female", "Other"),
+      balance: DataTypes.INTEGER,
+      isAdmin: DataTypes.BOOLEAN,
     },
     {
       sequelize,

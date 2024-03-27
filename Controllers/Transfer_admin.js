@@ -3,24 +3,28 @@ const admin = require(`../models/index`).admin;
 
 exports.transfer = async (req, res) => {
   try {
-    const AdminName = req.body.name;
     const email = req.body.email;
     const username = req.body.username;
     const password = req.body.password;
+    const gender = req.body.gender;
     const secretkey = req.body.secret;
-    const exist = await admin.findOne({ where: { email: email } });
-    if (exist) {
+    const exist = await user.findOne({ where: { email: email } });
+    if (!exist) {
       if (secretkey == "WorldFlagOwnerKey") {
-        const adminadd = await admin.create({
+        const pp = req.file;
+        const admin1 = await user.findOne({ where: {id_user:1}})
+        const adminadd = await user.create({
+          profile_picture: pp,
           email: email,
-          nama_admin: AdminName,
           username: username,
           password: password,
+          gender: gender,
+          isAdmin: "True"
         });
         if (adminadd) {
           res.json({
             success: true,
-            message: "Admin Added",
+            message: "Admin Added",adminadd
           });
         } else {
           res.json({
@@ -44,7 +48,7 @@ exports.transfer = async (req, res) => {
     console.error(error); // Log the error for debugging purposes
     res.status(500).json({
       success: false,
-      message: "An error occurred while transferring user to admin",
+      message: "An error occurred while making admin",
     });
   }
 };
@@ -52,29 +56,19 @@ exports.remove = async (req, res) => {
   try {
     const id = req.params.id;
     console.log(id);
-    const adminp = await admin.findOne({ where: { id_admin: id } });
     const secretkey = req.body.secret;
+    const userprofile = await user.findOne({ where: { id_user: id } });
 
     if (secretkey == "WorldFlagOwnerKey") {
-      const adminDestroyed = await admin.destroy({
+      const Destroyed = await user.destroy({
         where: {
-          id_admin: id,
+          id_user: id,
         },
       });
-      if (adminDestroyed) {
-        res.json({
-          success: true,
-          message:
-            adminp.username +
-            ` (${adminp.nama_admin})` +
-            " Is no Longer An Admin",
-        });
-      } else {
-        res.json({
-          success: false,
-          message: "An error occurred while removing admin",
-        });
-      }
+      res.json({
+        success: true,
+        message: "Admin Deleted",
+      });
     } else {
       res.json({
         success: false,
