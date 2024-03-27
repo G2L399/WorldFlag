@@ -12,7 +12,6 @@ exports.transfer = async (req, res) => {
     if (!exist) {
       if (secretkey == "WorldFlagOwnerKey") {
         const pp = req.file;
-        const admin1 = await user.findOne({ where: {id_user:1}})
         const adminadd = await user.create({
           profile_picture: pp,
           email: email,

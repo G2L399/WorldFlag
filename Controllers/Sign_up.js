@@ -70,6 +70,9 @@ exports.DeleteAcc = async (req, res) => {
         error: "Invalid Username or Password",
       });
     }
+    const reset = await User.sequelize.query(
+      "ALTER TABLE `user` AUTO_INCREMENT = 1"
+    );
     res.json({
       success: true,
       message: "User Deleted successfully",
@@ -172,5 +175,36 @@ exports.ForgotPasswordChange = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+exports.editprof = async (req, res) => {
+  try {
+    const id = req.session.idUser || req.user.id_user;
+    const username = req.body.username;
+    const pp = req.file.buffer;
+    const gender = req.body.gender;
+    const email = req.body.email;
+    console.log(username, pp,gender,email);
+    const userupdated = await User.update(
+      {
+        username: username,
+        profile_picture: pp,
+        user_type: gender,
+        email: email,
+      },
+      { where: { id_user: id } }
+    );
+    if (userupdated) {
+      res.json({
+        success: true,
+        message: "User Updated successfully",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Internal Server Error",
+    });
   }
 };
