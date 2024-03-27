@@ -24,7 +24,8 @@ exports.transfer = async (req, res) => {
         if (adminadd) {
           res.json({
             success: true,
-            message: "Admin Added",adminadd
+            message: "Admin Added",
+            data: adminadd
           });
         } else {
           res.json({
