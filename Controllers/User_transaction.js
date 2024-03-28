@@ -12,9 +12,6 @@ exports.addCart = async (req, res) => {
     const idUser = req.session.idUser || req.user.id_user;
     const idProduct = req.params.idProduct;
     const quantity = req.body.quantity;
-    if (req.user.isAdmin == false) {
-
-    }
     if (idUser == null) {
       res.json({
         success: false,
@@ -26,6 +23,7 @@ exports.addCart = async (req, res) => {
         id_product: idProduct,
       },
     });
+    console.log(idProduct, quantity);
     if (Product.stock > 0 && quantity <= Product.stock) {
       const User = await user.findOne({
         where: {
