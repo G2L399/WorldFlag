@@ -51,6 +51,7 @@ exports.InsertFlag = async (req, res) => {
       res.json({
         success: true,
         message: "Flag Inserted successfully",
+        data: newFlag,
       });
     } else {
       res.json({
@@ -104,13 +105,15 @@ exports.DeleteFlag = async (req, res) => {
 exports.DeleteAllFlag = async (req, res) => {
   try {
     if (req.session.isAdmin || req.user.isAdmin == "True") {
-      const result = await FlagsModel.destroy({ truncate: true });
-      await FlagsModel.sequelize.query(
+      const prepare = await FlagsModel.findAll();
+      const idProduct = prepare.map((prepare) => prepare.id_product);
+
+      const result = await FlagsModel.destroy({ where: {id_product:idProduct} });
+      const deleted = await FlagsModel.sequelize.query(
         "ALTER TABLE `product` AUTO_INCREMENT = 1"
       );
       console.log(result);
-      if (result === 0) {
-        // The destroy method returns the number of affected rows, so if it's 0, the record was not found.
+      if (result != 0) {
         res.json({
           success: true,
           message: `All Flags Deleted Successfully`,

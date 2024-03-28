@@ -184,7 +184,7 @@ exports.editprof = async (req, res) => {
     const pp = req.file.buffer;
     const gender = req.body.gender;
     const email = req.body.email;
-    console.log(username, pp,gender,email);
+    console.log(pp);
     const userupdated = await User.update(
       {
         username: username,

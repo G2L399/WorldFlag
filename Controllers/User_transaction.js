@@ -452,7 +452,7 @@ exports.topup = async (req, res) => {
   const newBalance = req.body.balance;
   const User = await user.findOne({
     where: {
-      id_user: 4,
+      id_user: idUser,
     },
   });
   const newUser = await user.update(
